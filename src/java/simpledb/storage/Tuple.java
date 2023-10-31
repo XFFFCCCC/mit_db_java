@@ -1,7 +1,9 @@
 package simpledb.storage;
 
+import simpledb.common.Type;
+
 import java.io.Serializable;
-import java.util.Arrays;
+
 import java.util.Iterator;
 
 /**
@@ -13,6 +15,9 @@ public class Tuple implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private TupleDesc td;
+    private Field[] fields;
+    private int len;
     /**
      * Create a new tuple with the specified schema (type).
      *
@@ -21,6 +26,17 @@ public class Tuple implements Serializable {
      */
     public Tuple(TupleDesc td) {
         // TODO: some code goes here
+        this.td=td;
+        this.len=td.numFields();
+        this.fields=new Field[len];
+//        for (int i = 0; i < len; i++) {
+//            Type fieldType = td.getFieldType(i);
+//            switch (fieldType){
+//                case  INT_TYPE:
+//                    fields[i]=new IntField(0);
+//            }
+//
+//        }
     }
 
     /**
@@ -28,7 +44,7 @@ public class Tuple implements Serializable {
      */
     public TupleDesc getTupleDesc() {
         // TODO: some code goes here
-        return null;
+        return td;
     }
 
     /**
@@ -57,6 +73,7 @@ public class Tuple implements Serializable {
      */
     public void setField(int i, Field f) {
         // TODO: some code goes here
+        fields[i]=f;
     }
 
     /**
@@ -65,7 +82,7 @@ public class Tuple implements Serializable {
      */
     public Field getField(int i) {
         // TODO: some code goes here
-        return null;
+        return fields[i];
     }
 
     /**
