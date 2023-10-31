@@ -21,6 +21,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Threadsafe
  */
 public class Catalog {
+    HashMap<Integer,DbFile> IdDbFile=new HashMap<>();
+    HashMap<Integer,TupleDesc> IdTD=new HashMap<>();
+    //目前我觉得有问题
+    HashMap<String,Integer> NameId=new HashMap<>();
+
+
+    HashMap<Integer,String> IdName=new HashMap<>();
 
     /**
      * Constructor.
@@ -42,6 +49,13 @@ public class Catalog {
      */
     public void addTable(DbFile file, String name, String pkeyField) {
         // TODO: some code goes here
+        int id=file.getId();
+        TupleDesc td = file.getTupleDesc();
+        IdTD.put(id,td);
+        IdDbFile.put(id,file);
+        NameId.put(name,id);
+        IdName.put(id,name);
+
     }
 
     public void addTable(DbFile file, String name) {
@@ -67,7 +81,11 @@ public class Catalog {
      */
     public int getTableId(String name) throws NoSuchElementException {
         // TODO: some code goes here
-        return 0;
+        Integer i = NameId.get(name);
+        if(i==null){
+            throw  new NoSuchElementException("name table doesn't exist");
+        }
+        return i;
     }
 
     /**
@@ -79,7 +97,11 @@ public class Catalog {
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
         // TODO: some code goes here
-        return null;
+        TupleDesc td = IdTD.get(tableid);
+        if(td==null){
+            throw new NoSuchElementException("table doesn't exist");
+        }
+        return td;
     }
 
     /**
@@ -91,7 +113,11 @@ public class Catalog {
      */
     public DbFile getDatabaseFile(int tableid) throws NoSuchElementException {
         // TODO: some code goes here
-        return null;
+        DbFile dbFile = IdDbFile.get(tableid);
+        if(dbFile==null){
+            throw  new NoSuchElementException("table doesn't exist");
+        }
+        return dbFile;
     }
 
     public String getPrimaryKey(int tableid) {
@@ -106,7 +132,8 @@ public class Catalog {
 
     public String getTableName(int id) {
         // TODO: some code goes here
-        return null;
+        String s = IdName.get(id);
+        return s;
     }
 
     /**
@@ -114,6 +141,10 @@ public class Catalog {
      */
     public void clear() {
         // TODO: some code goes here
+        IdDbFile.clear();
+        IdTD.clear();
+        NameId.clear();
+        IdName.clear();
     }
 
     /**

@@ -84,6 +84,8 @@ public class CatalogTest extends SimpleDbTestBase {
     	int id3 = r.nextInt();
     	Database.getCatalog().addTable(new SkeletonFile(id3, Utility.getTupleDesc(2)), name);
     	assertEquals(id3, Database.getCatalog().getTableId(name));
+//        System.out.println(Database.getCatalog().getTableId(name));
+//        assertEquals(id2, Database.getCatalog().getTableId(name));
     }
     
     /**
