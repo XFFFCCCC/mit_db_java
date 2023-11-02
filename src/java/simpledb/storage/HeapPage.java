@@ -9,6 +9,7 @@ import simpledb.transaction.TransactionId;
 import java.io.*;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 
 /**
  * Each instance of HeapPage stores data for one page of HeapFiles and
@@ -23,6 +24,7 @@ public class HeapPage implements Page {
     final TupleDesc td;
     final byte[] header;
     final Tuple[] tuples;
+    //元组数量
     final int numSlots;
 
     byte[] oldData;
@@ -76,7 +78,7 @@ public class HeapPage implements Page {
      */
     private int getNumTuples() {
         // TODO: some code goes here
-        return 0;
+        return  (BufferPool.getPageSize()*8)/(td.getSize()*8+1);
 
     }
 
@@ -88,7 +90,11 @@ public class HeapPage implements Page {
     private int getHeaderSize() {
 
         // TODO: some code goes here
-        return 0;
+        int i = numSlots / 8;
+        if(i*8<numSlots){
+            i++;
+        }
+        return i;
 
     }
 
@@ -122,7 +128,9 @@ public class HeapPage implements Page {
      */
     public HeapPageId getId() {
         // TODO: some code goes here
-        throw new UnsupportedOperationException("implement this");
+
+//        throw new UnsupportedOperationException("implement this");
+        return pid;
     }
 
     /**
@@ -294,7 +302,16 @@ public class HeapPage implements Page {
      */
     public int getNumUnusedSlots() {
         // TODO: some code goes here
-        return 0;
+        int size=0;
+        for (int i = 0; i < header.length; i++) {
+            byte tmp=header[i];
+            while(tmp!=0){
+                tmp= (byte) (tmp&(tmp-1));
+                    size++;
+            }
+
+        }
+        return numSlots-size;
     }
 
     /**
@@ -302,7 +319,9 @@ public class HeapPage implements Page {
      */
     public boolean isSlotUsed(int i) {
         // TODO: some code goes here
-        return false;
+        //找到对应的bit
+        int bit=header[i/8]&(1<<(i%8));
+        return bit!=0;
     }
 
     /**
@@ -317,9 +336,34 @@ public class HeapPage implements Page {
      * @return an iterator over all tuples on this page (calling remove on this iterator throws an UnsupportedOperationException)
      *         (note that this iterator shouldn't return tuples in empty slots!)
      */
+    //如何实现迭代器
     public Iterator<Tuple> iterator() {
         // TODO: some code goes here
-        return null;
+        return new Itr();
+    }
+
+    private class Itr implements Iterator<Tuple>{
+        public  int cursor;
+        private  int lastRet=-1;
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public Tuple next() {
+            return null;
+        }
+
+        @Override
+        public void remove() {
+            Iterator.super.remove();
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super Tuple> action) {
+            Iterator.super.forEachRemaining(action);
+        }
     }
 
 }

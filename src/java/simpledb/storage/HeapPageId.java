@@ -6,6 +6,8 @@ import java.util.Objects;
  * Unique identifier for HeapPage objects.
  */
 public class HeapPageId implements PageId {
+    private int tableId;
+    private int pgNo;
 
     /**
      * Constructor. Create a page id structure for a specific page of a
@@ -16,6 +18,8 @@ public class HeapPageId implements PageId {
      */
     public HeapPageId(int tableId, int pgNo) {
         // TODO: some code goes here
+        this.tableId=tableId;
+        this.pgNo=pgNo;
     }
 
     /**
@@ -23,7 +27,7 @@ public class HeapPageId implements PageId {
      */
     public int getTableId() {
         // TODO: some code goes here
-        return 0;
+        return tableId;
     }
 
     /**
@@ -32,7 +36,7 @@ public class HeapPageId implements PageId {
      */
     public int getPageNumber() {
         // TODO: some code goes here
-        return 0;
+        return pgNo;
     }
 
     /**
@@ -41,10 +45,22 @@ public class HeapPageId implements PageId {
      *         key in a hash table in the BufferPool, for example.)
      * @see BufferPool
      */
+    //string.hashCode();
     public int hashCode() {
+
+    int h=0;
+    h=31*h+(tableId&0xffffffff);
+    h=31*h+(pgNo&0xffffffff);
+
+    return h;
         // TODO: some code goes here
-        throw new UnsupportedOperationException("implement this");
+//        throw new UnsupportedOperationException("implement this");
     }
+
+
+
+
+
 
     /**
      * Compares one PageId to another.
@@ -55,6 +71,19 @@ public class HeapPageId implements PageId {
      */
     public boolean equals(Object o) {
         // TODO: some code goes here
+        if(o==null){
+            return false;
+        }
+        if(this==o){
+            return true;
+        }
+        if(o instanceof HeapPageId){
+            HeapPageId tmp= (HeapPageId) o;
+            if(this.pgNo==tmp.pgNo  && this.tableId==tmp.tableId){
+                return true;
+            }
+
+        }
         return false;
     }
 

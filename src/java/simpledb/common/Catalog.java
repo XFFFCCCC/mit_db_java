@@ -21,13 +21,23 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Threadsafe
  */
 public class Catalog {
-    HashMap<Integer,DbFile> IdDbFile=new HashMap<>();
-    HashMap<Integer,TupleDesc> IdTD=new HashMap<>();
-    //目前我觉得有问题
-    HashMap<String,Integer> NameId=new HashMap<>();
 
 
-    HashMap<Integer,String> IdName=new HashMap<>();
+    public class Table{
+        private DbFile df;
+        private String name;
+        private String pkeyField;
+
+        public Table(DbFile df, String name, String pkeyField) {
+            this.df = df;
+            this.name = name;
+            this.pkeyField = pkeyField;
+        }
+    }
+
+
+    Map<Integer,Table> tableMap=new HashMap<>();
+    Map<String ,Integer> nameIdMap=new HashMap<>();
 
     /**
      * Constructor.
@@ -49,16 +59,12 @@ public class Catalog {
      */
     public void addTable(DbFile file, String name, String pkeyField) {
         // TODO: some code goes here
-        int id=file.getId();
-        TupleDesc td = file.getTupleDesc();
-        IdTD.put(id,td);
-        IdDbFile.put(id,file);
-        NameId.put(name,id);
-        IdName.put(id,name);
+        tableMap.put(file.getId(),new Table(file,name,pkeyField));
+        nameIdMap.put(name,file.getId());
 
     }
 
-    public void addTable(DbFile file, String name) {
+    public void     addTable(DbFile file, String name) {
         addTable(file, name, "");
     }
 
@@ -80,10 +86,9 @@ public class Catalog {
      * @throws NoSuchElementException if the table doesn't exist
      */
     public int getTableId(String name) throws NoSuchElementException {
-        // TODO: some code goes here
-        Integer i = NameId.get(name);
+        Integer i = nameIdMap.get(name);
         if(i==null){
-            throw  new NoSuchElementException("name table doesn't exist");
+            throw new NoSuchElementException("table doesn't exist");
         }
         return i;
     }
@@ -97,11 +102,12 @@ public class Catalog {
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
         // TODO: some code goes here
-        TupleDesc td = IdTD.get(tableid);
-        if(td==null){
-            throw new NoSuchElementException("table doesn't exist");
+        Table table = tableMap.getOrDefault(tableid,null);
+        if(table==null){
+            throw new  NoSuchElementException("tableid doesn't exist");
+        }else{
+            return table.df.getTupleDesc();
         }
-        return td;
     }
 
     /**
@@ -113,27 +119,32 @@ public class Catalog {
      */
     public DbFile getDatabaseFile(int tableid) throws NoSuchElementException {
         // TODO: some code goes here
-        DbFile dbFile = IdDbFile.get(tableid);
-        if(dbFile==null){
+
+        Table table= tableMap.getOrDefault(tableid,null);
+        if(table==null){
             throw  new NoSuchElementException("table doesn't exist");
         }
-        return dbFile;
+        return table.df;
     }
 
     public String getPrimaryKey(int tableid) {
         // TODO: some code goes here
-        return null;
+        Table table = tableMap.getOrDefault(tableid, null);
+        if(table==null){
+            throw new NoSuchElementException("tableid doesn't exit");
+        }
+        return table.pkeyField;
     }
 
     public Iterator<Integer> tableIdIterator() {
         // TODO: some code goes here
-        return null;
+        return tableMap.keySet().iterator();
     }
 
     public String getTableName(int id) {
         // TODO: some code goes here
-        String s = IdName.get(id);
-        return s;
+        Table s = tableMap.get(id);
+        return s.name;
     }
 
     /**
@@ -141,10 +152,8 @@ public class Catalog {
      */
     public void clear() {
         // TODO: some code goes here
-        IdDbFile.clear();
-        IdTD.clear();
-        NameId.clear();
-        IdName.clear();
+       tableMap.clear();
+       nameIdMap.clear();
     }
 
     /**

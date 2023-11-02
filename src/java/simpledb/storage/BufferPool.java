@@ -1,13 +1,13 @@
 package simpledb.storage;
 
-import simpledb.common.Database;
-import simpledb.common.DbException;
-import simpledb.common.DeadlockException;
-import simpledb.common.Permissions;
+import simpledb.common.*;
 import simpledb.transaction.TransactionAbortedException;
 import simpledb.transaction.TransactionId;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -38,6 +38,9 @@ public class BufferPool {
      */
     public static final int DEFAULT_PAGES = 50;
 
+    private   int numPages=0;
+    Map<PageId,Page> map=new HashMap<>();
+
     /**
      * Creates a BufferPool that caches up to numPages pages.
      *
@@ -45,6 +48,7 @@ public class BufferPool {
      */
     public BufferPool(int numPages) {
         // TODO: some code goes here
+        this.numPages=numPages;
     }
 
     public static int getPageSize() {
@@ -76,10 +80,37 @@ public class BufferPool {
      * @param pid  the ID of the requested page
      * @param perm the requested permissions on the page
      */
+    //锁
     public Page getPage(TransactionId tid, PageId pid, Permissions perm)
-            throws TransactionAbortedException, DbException {
+            throws TransactionAbortedException, DbException,IOException {
         // TODO: some code goes here
-        return null;
+        Page page = map.get(pid);
+        if(page!=null){
+            return page;
+        }
+        int tableId = pid.getTableId();
+        int pageNumber = pid.getPageNumber();
+        Catalog catalog = Database.getCatalog();
+        DbFile df = catalog.getDatabaseFile(tableId);
+
+        HeapFile hf= (HeapFile) df;
+        File file = hf.getFile();
+
+        RandomAccessFile raf=null;
+        raf=new RandomAccessFile(file,"rw");
+        if(pageNumber>0){
+            raf.seek((pageNumber)*BufferPool.getPageSize());
+        }
+        byte []bt=new byte[BufferPool.getPageSize()];
+        raf.read(bt);
+
+        page = new HeapPage((HeapPageId) pid,bt);
+
+        map.put(pid,page);
+
+
+
+        return page;
     }
 
     /**

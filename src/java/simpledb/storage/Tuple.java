@@ -4,7 +4,9 @@ import simpledb.common.Type;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Tuple maintains information about the contents of a tuple. Tuples have a
@@ -18,6 +20,7 @@ public class Tuple implements Serializable {
     private TupleDesc td;
     private Field[] fields;
     private int len;
+    private RecordId recordId;
     /**
      * Create a new tuple with the specified schema (type).
      *
@@ -53,7 +56,7 @@ public class Tuple implements Serializable {
      */
     public RecordId getRecordId() {
         // TODO: some code goes here
-        return null;
+        return recordId;
     }
 
     /**
@@ -63,6 +66,7 @@ public class Tuple implements Serializable {
      */
     public void setRecordId(RecordId rid) {
         // TODO: some code goes here
+        recordId=rid;
     }
 
     /**
@@ -103,7 +107,24 @@ public class Tuple implements Serializable {
      */
     public Iterator<Field> fields() {
         // TODO: some code goes here
-        return null;
+        return new Itr();
+    }
+
+
+    private class Itr implements Iterator<Field>{
+        int cursor;   //index of next element  to return
+
+
+        @Override
+        public boolean hasNext() {
+            return cursor!=len;
+        }
+
+        @Override
+        public Field next() {
+            Field[] fields = Tuple.this.fields;
+            return fields[cursor++];
+        }
     }
 
     /**
@@ -111,5 +132,6 @@ public class Tuple implements Serializable {
      */
     public void resetTupleDesc(TupleDesc td) {
         // TODO: some code goes here
+        this.td=td;
     }
 }

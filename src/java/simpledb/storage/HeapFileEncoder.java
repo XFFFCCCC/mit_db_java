@@ -118,9 +118,10 @@ public class HeapFileEncoder {
         int recordcount = 0;
         int npages = 0;
         int fieldNo = 0;
-
+        //头部数据
         ByteArrayOutputStream headerBAOS = new ByteArrayOutputStream(nheaderbytes);
         DataOutputStream headerStream = new DataOutputStream(headerBAOS);
+        //一起的数据
         ByteArrayOutputStream pageBAOS = new ByteArrayOutputStream(npagebytes);
         DataOutputStream pageStream = new DataOutputStream(pageBAOS);
 
@@ -138,8 +139,10 @@ public class HeapFileEncoder {
                     continue;
                 recordcount++;
                 first = true;
-            } else
+            } else {
                 first = false;
+            }
+
             if (c == fieldSeparator || c == '\n' || c == '\r') {
                 String s = new String(buf, 0, curpos);
                 if (typeAr[fieldNo] == Type.INT_TYPE) {
@@ -187,7 +190,7 @@ public class HeapFileEncoder {
                     || done && npages == 0) {
                 int i = 0;
                 byte headerbyte = 0;
-
+                //刷入头部
                 for (i = 0; i < nheaderbits; i++) {
                     if (i < recordcount)
                         headerbyte |= (1 << (i % 8));
