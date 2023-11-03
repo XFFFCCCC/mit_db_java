@@ -1,6 +1,8 @@
 package simpledb.storage;
 
+import simpledb.common.Database;
 import simpledb.common.DbException;
+import simpledb.common.Permissions;
 import simpledb.transaction.TransactionAbortedException;
 import simpledb.transaction.TransactionId;
 
@@ -28,7 +30,7 @@ public class HeapFileIerator implements DbFileIterator{
     @Override
     public void open() throws DbException, TransactionAbortedException {
         pgNo=0;
-        HeapPage page = (HeapPage) hf.readPage(new HeapPageId(tableId, pgNo));
+        HeapPage page = (HeapPage) Database.getBufferPool().getPage(tid,new HeapPageId(tableId,pgNo), Permissions.READ_ONLY);
         itr=page.iterator();
         pgNo++;
     }
@@ -40,7 +42,7 @@ public class HeapFileIerator implements DbFileIterator{
         }
         while(!itr.hasNext()){
             if(pgNo<hf.numPages()){
-                HeapPage page = (HeapPage) hf.readPage(new HeapPageId(tableId, pgNo));
+                HeapPage page =  (HeapPage) Database.getBufferPool().getPage(tid,new HeapPageId(tableId,pgNo), Permissions.READ_ONLY);
                 itr=page.iterator();
                 pgNo++;
             }else{

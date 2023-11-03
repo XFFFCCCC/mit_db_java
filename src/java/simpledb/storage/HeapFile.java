@@ -28,7 +28,7 @@ public class HeapFile implements DbFile {
 
     private File file;
 
-    private RandomAccessFile randomAccessFile;
+
 
 
     /**
@@ -41,6 +41,7 @@ public class HeapFile implements DbFile {
         // TODO: some code goes here
         this.file=f;
         this.td=td;
+
     }
 
     /**
@@ -82,14 +83,16 @@ public class HeapFile implements DbFile {
     // see DbFile.java for javadocs
     public Page readPage(PageId pid)  {
         // TODO: some code goes here
-        BufferPool bufferPool = new BufferPool(50);
-        Page page = null;
+
+        Page page= null;
         try {
-            page = bufferPool.getPage(new TransactionId(), pid,  Permissions.READ_WRITE);
-        } catch (TransactionAbortedException e) {
-            throw new RuntimeException(e);
-        } catch (DbException e) {
-            throw new RuntimeException(e);
+            RandomAccessFile raf=new RandomAccessFile(file,"rw");
+            int tableId = pid.getTableId();
+            int pageNo = pid.getPageNumber();
+            raf.seek(pageNo*BufferPool.getPageSize());
+            byte[] bytes=new byte[BufferPool.getPageSize()];
+            raf.read(bytes);
+            page = new HeapPage((HeapPageId) pid,bytes);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

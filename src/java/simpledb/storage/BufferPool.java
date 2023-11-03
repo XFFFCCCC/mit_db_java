@@ -82,30 +82,19 @@ public class BufferPool {
      */
     //锁
     public Page getPage(TransactionId tid, PageId pid, Permissions perm)
-            throws TransactionAbortedException, DbException,IOException {
+            throws TransactionAbortedException, DbException {
         // TODO: some code goes here
         Page page = map.get(pid);
         if(page!=null){
             return page;
         }
+
         int tableId = pid.getTableId();
-        int pageNumber = pid.getPageNumber();
         Catalog catalog = Database.getCatalog();
         DbFile df = catalog.getDatabaseFile(tableId);
 
         HeapFile hf= (HeapFile) df;
-        File file = hf.getFile();
-
-        RandomAccessFile raf=null;
-        raf=new RandomAccessFile(file,"rw");
-        if(pageNumber>0){
-            raf.seek((pageNumber)*BufferPool.getPageSize());
-        }
-        byte []bt=new byte[BufferPool.getPageSize()];
-        raf.read(bt);
-
-        page = new HeapPage((HeapPageId) pid,bt);
-
+        page = hf.readPage(pid);
         map.put(pid,page);
 
 
