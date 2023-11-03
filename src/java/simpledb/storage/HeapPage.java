@@ -334,7 +334,7 @@ public class HeapPage implements Page {
 
     /**
      * @return an iterator over all tuples on this page (calling remove on this iterator throws an UnsupportedOperationException)
-     *         (note that this iterator shouldn't return tuples in empty slots!)
+     *      *         (note that this iterator shouldn't return tuples in empty slots!)
      */
     //如何实现迭代器
     public Iterator<Tuple> iterator() {
@@ -343,27 +343,34 @@ public class HeapPage implements Page {
     }
 
     private class Itr implements Iterator<Tuple>{
-        public  int cursor;
-        private  int lastRet=-1;
+        public  int cursor=0;
+//        private  int lastRet=-1;
+
+
         @Override
         public boolean hasNext() {
+
+            for (int i = cursor; i < numSlots; i++) {
+                if(isSlotUsed(i)){
+                    cursor=i;
+                    return true;
+                }
+            }
+            cursor=numSlots;
             return false;
         }
 
         @Override
         public Tuple next() {
-            return null;
+            //找到这个元组的数据 并且返回
+            return tuples[cursor++];
         }
 
         @Override
         public void remove() {
-            Iterator.super.remove();
+            throw  new UnsupportedOperationException();
         }
 
-        @Override
-        public void forEachRemaining(Consumer<? super Tuple> action) {
-            Iterator.super.forEachRemaining(action);
-        }
     }
 
 }
