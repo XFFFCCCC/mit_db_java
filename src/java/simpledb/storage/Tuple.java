@@ -99,7 +99,11 @@ public class Tuple implements Serializable {
      */
     public String toString() {
         // TODO: some code goes here
-        throw new UnsupportedOperationException("Implement this");
+        StringBuilder sb=new StringBuilder();
+        for (Field field : this.fields) {
+            sb.append(field.toString()+"  ");
+        }
+        return sb.toString();
     }
 
     /**

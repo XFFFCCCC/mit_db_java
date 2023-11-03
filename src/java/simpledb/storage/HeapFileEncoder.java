@@ -143,7 +143,7 @@ public class HeapFileEncoder {
                 first = false;
             }
 
-            if (c == fieldSeparator || c == '\n' || c == '\r') {
+             if (c == fieldSeparator || c == '\n' || c == '\r') {
                 String s = new String(buf, 0, curpos);
                 if (typeAr[fieldNo] == Type.INT_TYPE) {
                     try {
